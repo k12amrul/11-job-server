@@ -58,15 +58,15 @@ async function run() {
       res.send( result)
     })
 
-    // app.get('/myjobs/:email', async (req, res) => {
-    //   const email = req.params.email
+    app.get('/myjobs/:email', async (req, res) => {
+      const email = req.params.email
 
-    //   const query = { }
-    //   jobsCollection.find()
-    //   const result = await query.toArray()
-    //   res.send(result)
+      const query = {loggedInUserEmail :email }
+      
+      const result = await jobsCollection.find(query).toArray()
+      res.send(result)
 
-    // })
+    })
 
 
 
