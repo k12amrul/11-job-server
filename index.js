@@ -50,22 +50,73 @@ async function run() {
     })
 
     app.get('/job/:id', async (req, res) => {
-      const id = req.params.id 
-      const query ={ _id : new ObjectId( id) }
-      const result  = await jobsCollection.findOne( query)
+      const id = req.params.id
+      const query = { _id: new ObjectId(id) }
+      const result = await jobsCollection.findOne(query)
 
 
-      res.send( result)
+      res.send(result)
     })
 
     app.get('/myjobs/:email', async (req, res) => {
       const email = req.params.email
 
-      const query = {loggedInUserEmail :email }
-      
+      const query = { loggedInUserEmail: email }
+
       const result = await jobsCollection.find(query).toArray()
       res.send(result)
 
+    })
+
+    app.post( '/job',async( req ,res )  =>{ 
+
+      const newJob= req.body
+      const result = await jobsCollection.insertOne(newJob )
+
+      res.send( result)
+
+
+    } )
+
+    app.put('/job/:id', async (req, res) => {
+      const id = req.params.id
+      const filter = { _id: new ObjectId(id) }
+      const updatedItem = req.body
+      const options = { upsert: true }
+      const jobItem = {
+        $set: {
+
+          ...updatedItem
+
+          // subcategory_Name: updatedItem.subcategory_Name,
+          // item_name: updatedItem.item_name,
+          // customization: updatedItem.customization,
+          // description: updatedItem.description,
+          // imageURL: updatedItem.imageURL,
+          // price: updatedItem.price,
+          // rating: updatedItem.rating,
+          // processing_time: updatedItem.processing_time,
+          // stockStatus: updatedItem.stockStatus,
+          // discount: updatedItem.discount,
+          // user_email: updatedItem.user_email,
+          // user_name: updatedItem.user_name,
+
+
+
+        }
+      }
+      const result = await jobsCollection.updateOne(filter, jobItem, options)
+      res.send(result)
+
+
+    })
+
+    app.delete('/job/:id', async (req, res) => {
+      const id = req.params.id
+      const query = { _id: new ObjectId(id) }
+
+      const result = await jobsCollection.deleteOne(query)
+      res.send(result)
     })
 
 
