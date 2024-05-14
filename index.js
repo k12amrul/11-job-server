@@ -88,16 +88,7 @@ async function run() {
 
           ...updatedItem
 
-          // subcategory_Name: updatedItem.subcategory_Name,
-          // item_name: updatedItem.item_name,
-          // customization: updatedItem.customization,
-          // description: updatedItem.description,
-          // imageURL: updatedItem.imageURL,
-          // price: updatedItem.price,
-          // rating: updatedItem.rating,
-          // processing_time: updatedItem.processing_time,
-          // stockStatus: updatedItem.stockStatus,
-          // discount: updatedItem.discount,
+         
           // user_email: updatedItem.user_email,
           // user_name: updatedItem.user_name,
 
