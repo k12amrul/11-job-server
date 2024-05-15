@@ -10,11 +10,15 @@ const jwt = require('jsonwebtoken');
 
 
 // app.use(cors())
-app.use(cors({
-  origin: ["http://localhost:5173"],
-  credentials: true
+const corsConfig = {
+  origin: '*',
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE']
+  }
 
-}))
+  app.use(cors(corsConfig))
+  
+
 app.use(express.json())
 app.use(cookieParser())
 // app.use(cors({ origin: ["http://localhost:5173", "https://eloquent-dango-c20301.netlify.app"] }))
@@ -50,77 +54,78 @@ async function run() {
 
 
     const jobsCollection = client.db("jobDB").collection("jobs");
+    const applyCollection = client.db("jobDB").collection("apply");
 
 
 
-    const logger = async (req, res, next) => {
-      console.log('called : ', req.host, req.originalUrl)
+    // const logger = async (req, res, next) => {
+    //   console.log('called : ', req.host, req.originalUrl)
 
-      next()
+    //   next()
 
-    }
-    const verifyToken = async (req, res, next) => {
-      const token = req.cookies?.token
-      console.log('  token in middleware ', token)
-      if (!token) {
-        return res.status(401).send({ message: 'not authorized ' })
-      }
+    // }
+    // const verifyToken = async (req, res, next) => {
+    //   const token = req.cookies?.token
+    //   console.log('  token in middleware ', token)
+    //   if (!token) {
+    //     return res.status(401).send({ message: 'not authorized ' })
+    //   }
 
-      jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
-        console.log(err)
-        if (err) {
-          return res.status(401).send({ message: 'un authorized ' })
+    //   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
+    //     console.log(err)
+    //     if (err) {
+    //       return res.status(401).send({ message: 'un authorized ' })
 
-        }
-        console.log(' value in token ', decoded)
+    //     }
+    //     console.log(' value in token ', decoded)
 
-        req.user = decoded
+    //     req.user = decoded
 
-        next()
-      })
-      //  token asena 
-      //  req.userJwt= decoded
+    //     next()
+    //   })
+    //   //  token asena 
+    //   //  req.userJwt= decoded
 
-      // next()
+    //   // next()
 
-    }
+    // }
 
-    app.post('/jwt', logger, (req, res) => {
-      // console.log( process.env.ACCESS_TOKEN_SECRET)
-      const user = req.body
-      // console.log("user for token", user)
-      // console.log( process.env.ACCESS_TOKEN_SECRET)
-      const token = jwt.sign({
-        user
-      }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' });
+    // app.post('/jwt', logger, (req, res) => {
+    //   // console.log( process.env.ACCESS_TOKEN_SECRET)
+    //   const user = req.body
+    //   // console.log("user for token", user)
+    //   // console.log( process.env.ACCESS_TOKEN_SECRET)
+    //   const token = jwt.sign({
+    //     user
+    //   }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1h' });
 
-      console.log({token :token} )
-      res
-        .cookie('token', token,cookieOptions 
-        //  {
-        //   httpOnly: true,
-        //   secure: false,
-        //   //  sameSite: 'none'
-        // }
-      )
-        .send({ success: true })
-
-
-
-
-    })
+    //   console.log({token :token} )
+    //   res
+    //     .cookie('token', token,cookieOptions 
+    //     //  {
+    //     //   httpOnly: true,
+    //     //   secure: false,
+    //     //   //  sameSite: 'none'
+    //     // }
+    //   )
+    //     .send({ success: true })
 
 
 
 
+    // })
 
-    app.post("/logout", async (req, res) => {
-      const user = req.body
-      console.log('log out ', user)
 
-      res.clearCookie('token', { maxAge: 0 }).send({ success: true })
 
-    })
+
+
+    // app.post("/logout", async (req, res) => {
+    //   const user = req.body
+    //   console.log('log out ', user)
+
+    //   res.clearCookie('token', { maxAge: 0 }).send({ success: true })
+
+    // })
 
 
 
@@ -135,7 +140,7 @@ async function run() {
 
     })
 
-    app.get('/job/:id', logger, verifyToken, async (req, res) => {
+    app.get('/job/:id', async (req, res) => {
       const id = req.params.id
       const query = { _id: new ObjectId(id) }
       const result = await jobsCollection.findOne(query)
@@ -144,7 +149,7 @@ async function run() {
       res.send(result)
     })
 
-    app.get('/myjobs/:email', logger, verifyToken, async (req, res) => {
+    app.get('/myjobs/:email',  async (req, res) => {
       const email = req.params.email
 
       const query = { loggedInUserEmail: email }
@@ -196,12 +201,18 @@ async function run() {
       res.send(result)
     })
 
+    app.get('/applyJob', async (req, res) => {
+      const query = applyCollection.find()
+      const result = await query.toArray()
+      res.send(result)
+
+    })
 
 
     app.post( '/applyJob',async( req ,res )  =>{ 
 
       const appliedJob= req.body
-      const result = await jobsCollection.insertOne(appliedJob )
+      const result = await applyCollection.insertOne(appliedJob )
 
       res.send( result)
 
@@ -212,7 +223,7 @@ async function run() {
 
 
     app.get('/', (req, res) => {
-      res.send('a-11 server testing successfully ')
+      res.send('a-11-- eleven server testing successfully ')
     })
 
 
